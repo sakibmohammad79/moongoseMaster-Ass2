@@ -54,6 +54,7 @@ const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
     required: true,
+    unique: true,
   },
   username: {
     type: String,
@@ -96,21 +97,17 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// creating custom static method
-userSchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await User.findOne({ id });
-  return existingUser;
-};
-
 userSchema.post('save', function (doc, next) {
-  doc.password = '';
+  doc.password = ' ';
   next();
 });
 
-// creating custom static method
-userSchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await User.findOne({ id });
+// export const User = model<TUser>('User', userSchema);
+userSchema.statics.isUserExists = async function (userId: string) {
+  const existingUser = await User.findOne({ userId });
   return existingUser;
 };
 
-export const User = model<TUser, UserModel>('User', userSchema);
+const User = model<TUser, UserModel>('User', userSchema);
+
+export default User;

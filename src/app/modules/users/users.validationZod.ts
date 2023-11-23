@@ -22,7 +22,7 @@ const userZodValidationSchema = z.object({
   username: z.string().min(1, { message: 'Username cannot be empty' }),
   password: z
     .string()
-    .min(8, { message: 'Password must be at least 8 characters long' }),
+    .min(6, { message: 'Password must be at least 8 characters long' }),
   fullName: fullNameSchema,
   age: z.number().min(0, { message: 'Age must be a non-negative number' }),
   email: z.string().email({ message: 'Invalid email format' }),

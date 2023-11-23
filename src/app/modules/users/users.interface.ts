@@ -31,7 +31,6 @@ export type TUser = {
 };
 
 //for creating satatic==>
-
 export interface UserModel extends Model<TUser> {
   isUserExists(id: number): Promise<TUser | null>;
 }
