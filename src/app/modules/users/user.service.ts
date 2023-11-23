@@ -6,17 +6,20 @@ const createUserIntoDB = async (userData: TUser) => {
     throw new Error('user already exist');
   }
   const result = await User.create(userData);
+  const createUser = await User.findOne({ _id: result._id }).select(
+    '-password',
+  );
 
-  return result;
+  return createUser;
 };
 
 const getAllUserFromDB = async () => {
-  const result = await User.find();
+  const result = await User.find().select('-password');
   return result;
 };
 
 const getSingleUserFromDB = async (userId: number) => {
-  const result = await User.findOne({ userId });
+  const result = await User.findOne({ userId }).select('-password');
   return result;
 };
 
@@ -32,7 +35,7 @@ const updateUserFromDB = async (userId: string, updateData: any) => {
     { userId: userId },
     { $set: updateData },
     options,
-  );
+  ).select('-password');
   return updatedUser;
 };
 
