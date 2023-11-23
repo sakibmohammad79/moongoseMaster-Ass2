@@ -18,7 +18,7 @@ const getAllUserFromDB = async () => {
   return result;
 };
 
-const getSingleUserFromDB = async (userId: number) => {
+const getSingleUserFromDB = async (userId: string) => {
   const result = await User.findOne({ userId }).select('-password');
   return result;
 };
@@ -28,15 +28,34 @@ const deleteUserFromDB = async (userId: string) => {
   return result;
 };
 
-const updateUserFromDB = async (userId: string, updateData: any) => {
+const updateUserFromDB = async (userId: string, userData: any) => {
   const options = { new: true };
 
   const updatedUser = await User.findOneAndUpdate(
     { userId: userId },
-    { $set: updateData },
+    { $set: userData },
     options,
   ).select('-password');
   return updatedUser;
+};
+
+const updateUserOrdesFromDB = async (userId: string, newProduct: any) => {
+  const updateUserOrders = await User.updateOne(
+    { userId },
+    { $push: { orders: newProduct } },
+  );
+  if (!updateUserOrders) {
+    throw new Error('User not found');
+  }
+  return updateUserOrders;
+};
+
+const getAllOrdersFromDB = async (userId: string) => {
+  const result = await User.aggregate([
+    { $match: { 'user.userId': userId } },
+    { $project: { 'user.orders': 1 } },
+  ]);
+  return result;
 };
 
 export const UserServices = {
@@ -45,4 +64,6 @@ export const UserServices = {
   getSingleUserFromDB,
   deleteUserFromDB,
   updateUserFromDB,
+  updateUserOrdesFromDB,
+  getAllOrdersFromDB,
 };
