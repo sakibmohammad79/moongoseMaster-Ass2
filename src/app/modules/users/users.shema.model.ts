@@ -1,9 +1,15 @@
 import { Schema, model } from 'mongoose';
-import { Address, FullName, Order, User } from './users.interface';
+import {
+  TAddress,
+  TFullName,
+  TOrder,
+  TUser,
+  UserModel,
+} from './users.interface';
 import bcrypt from 'bcrypt';
 import { config } from '../../config';
 
-const fullNameSchema = new Schema<FullName>({
+const fullNameSchema = new Schema<TFullName>({
   firstName: {
     type: String,
     required: true,
@@ -14,7 +20,7 @@ const fullNameSchema = new Schema<FullName>({
   },
 });
 
-const addressSchema = new Schema<Address>({
+const addressSchema = new Schema<TAddress>({
   street: {
     type: String,
     required: true,
@@ -29,7 +35,7 @@ const addressSchema = new Schema<Address>({
   },
 });
 
-const orderSchema = new Schema<Order>({
+const orderSchema = new Schema<TOrder>({
   productName: {
     type: String,
     required: true,
@@ -44,11 +50,10 @@ const orderSchema = new Schema<Order>({
   },
 });
 
-const userSchema = new Schema<User>({
+const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
     required: true,
-    unique: true,
   },
   username: {
     type: String,
@@ -67,7 +72,6 @@ const userSchema = new Schema<User>({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
   isActive: {
     type: Boolean,
@@ -92,10 +96,21 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// creating custom static method
+userSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await User.findOne({ id });
+  return existingUser;
+};
+
 userSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
 });
 
-const UserModel = model<User>('User', userSchema);
-export default UserModel;
+// creating custom static method
+userSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await User.findOne({ id });
+  return existingUser;
+};
+
+export const User = model<TUser, UserModel>('User', userSchema);
