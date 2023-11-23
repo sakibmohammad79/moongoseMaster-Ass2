@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import userZodValidationSchema from './users.validationZod';
+import { pick } from 'lodash';
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -9,6 +10,7 @@ const createUser = async (req: Request, res: Response) => {
     const zodValidationData = userZodValidationSchema.parse(userData);
 
     const result = await UserServices.createUserIntoDB(zodValidationData);
+
     res.status(200).json({
       success: true,
       message: 'User created successfully!',
@@ -26,10 +28,17 @@ const createUser = async (req: Request, res: Response) => {
 const getAllUser = async (req: Request, res: Response) => {
   try {
     const result = await UserServices.getAllUserFromDB();
+
+    const requiredKeys = ['username', 'fullName', 'age', 'email', 'address'];
+
+    const filteredResult = result.map((user) =>
+      pick(user.toObject(), requiredKeys),
+    );
+
     res.status(200).json({
       success: true,
       message: 'Users fetched successfully!',
-      data: result,
+      data: filteredResult,
     });
   } catch (error) {
     res.status(500).json({
