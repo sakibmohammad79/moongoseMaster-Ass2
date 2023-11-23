@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { Address, FullName, Order, User } from './users.interface';
+import bcrypt from 'bcrypt';
+import { config } from '../../config';
 
 const fullNameSchema = new Schema<FullName>({
   firstName: {
@@ -80,6 +82,19 @@ const userSchema = new Schema<User>({
   ],
   address: addressSchema,
   orders: [orderSchema],
+});
+
+userSchema.pre('save', async function (next) {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_round),
+  );
+  next();
+});
+
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
 });
 
 const UserModel = model<User>('User', userSchema);
