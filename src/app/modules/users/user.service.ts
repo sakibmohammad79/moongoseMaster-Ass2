@@ -99,6 +99,7 @@ const getTotalPriceFromDB = async (userId: number) => {
         },
       },
     },
+    { $project: { totalPrice: 1, _id: 0 } },
   ]);
   return result;
 };
