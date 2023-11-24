@@ -50,14 +50,45 @@ const updateUserOrdesFromDB = async (userId: string, newProduct: any) => {
   return updateUserOrders;
 };
 
-const getAllOrdersFromDB = async (userId: string) => {
+const getAllOrdersFromDB = async (userId: number) => {
+  const result = await User.find(
+    {
+      userId: userId,
+    },
+    { orders: 1 },
+  );
+  return result;
+};
+// const getAllOrdersFromDB = async (userId: number) => {
+//   const result = await User.aggregate([
+//     { $match: { userId: userId } },
+//     { $project: { _id: 0, orders: 1 } },
+//   ]);
+//   return result;
+// };
+
+const getTotalPriceFromDB = async (userId: number) => {
   const result = await User.aggregate([
-    { $match: { 'user.userId': userId } },
-    { $project: { 'user.orders': 1 } },
+    {
+      $match: {
+        userId: userId,
+      },
+    },
+    {
+      $unwind: '$data',
+    },
+    {
+      $unwind: '$orders',
+    },
+    {
+      $project: {
+        _id: 0,
+        orders: 1,
+      },
+    },
   ]);
   return result;
 };
-
 export const UserServices = {
   createUserIntoDB,
   getAllUserFromDB,
@@ -66,4 +97,5 @@ export const UserServices = {
   updateUserFromDB,
   updateUserOrdesFromDB,
   getAllOrdersFromDB,
+  getTotalPriceFromDB,
 };

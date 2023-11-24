@@ -11,7 +11,7 @@ app.use(cors());
 app.use('/api', UserRoutes);
 
 const getAController = (req: Request, res: Response) => {
-  res.send('Hello World!');
+  res.send('Hello Worlddd!');
 };
 
 app.get('/', getAController);
