@@ -1,14 +1,11 @@
 import { TUser } from './users.interface';
-import User from './users.shema.model';
+import { User } from './users.shema.model';
 
 const createUserIntoDB = async (userData: TUser) => {
-  if (await User.isUserExists(userData.userId)) {
-    throw new Error('user already exist');
-  }
   const result = await User.create(userData);
-  const createUser = await User.findOne({ _id: result._id }).select(
-    '-password',
-  );
+  const createUser = await User.findOne({ _id: result._id })
+    .select('-password')
+    .select('-orders');
 
   return createUser;
 };
@@ -18,28 +15,44 @@ const getAllUserFromDB = async () => {
   return result;
 };
 
-const getSingleUserFromDB = async (userId: string) => {
-  const result = await User.findOne({ userId }).select('-password');
+const getSingleUserFromDB = async (userId: number) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User not found!');
+  }
+  const result = await User.findOne({ userId })
+    .select('-password')
+    .select('-orders');
   return result;
 };
 
-const deleteUserFromDB = async (userId: string) => {
+const deleteUserFromDB = async (userId: number) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User not found!');
+  }
   const result = await User.deleteOne({ userId });
   return result;
 };
 
-const updateUserFromDB = async (userId: string, userData: any) => {
+const updateUserFromDB = async (userId: number, userData: any) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User not found!');
+  }
   const options = { new: true };
 
   const updatedUser = await User.findOneAndUpdate(
     { userId: userId },
     { $set: userData },
     options,
-  ).select('-password');
+  )
+    .select('-password')
+    .select('-orders');
   return updatedUser;
 };
 
-const updateUserOrdesFromDB = async (userId: string, newProduct: any) => {
+const updateUserOrdesFromDB = async (userId: number, newProduct: any) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User not found!');
+  }
   const updateUserOrders = await User.updateOne(
     { userId },
     { $push: { orders: newProduct } },
@@ -51,6 +64,9 @@ const updateUserOrdesFromDB = async (userId: string, newProduct: any) => {
 };
 
 const getAllOrdersFromDB = async (userId: number) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User not found!');
+  }
   const result = await User.find(
     {
       userId: userId,
@@ -59,15 +75,11 @@ const getAllOrdersFromDB = async (userId: number) => {
   );
   return result;
 };
-// const getAllOrdersFromDB = async (userId: number) => {
-//   const result = await User.aggregate([
-//     { $match: { userId: userId } },
-//     { $project: { _id: 0, orders: 1 } },
-//   ]);
-//   return result;
-// };
 
 const getTotalPriceFromDB = async (userId: number) => {
+  if (!(await User.isUserExists(userId))) {
+    throw new Error('User not found!');
+  }
   const result = await User.aggregate([
     {
       $match: {
@@ -75,15 +87,16 @@ const getTotalPriceFromDB = async (userId: number) => {
       },
     },
     {
-      $unwind: '$data',
-    },
-    {
       $unwind: '$orders',
     },
     {
-      $project: {
-        _id: 0,
-        orders: 1,
+      $group: {
+        _id: null,
+        totalPrice: {
+          $sum: {
+            $multiply: ['$orders.price', '$orders.quantity'],
+          },
+        },
       },
     },
   ]);
