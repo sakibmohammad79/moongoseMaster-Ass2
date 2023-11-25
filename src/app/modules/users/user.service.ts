@@ -71,9 +71,9 @@ const getAllOrdersFromDB = async (userId: number) => {
     {
       userId: userId,
     },
-    { orders: 1 },
+    { _id: 0, orders: 1 },
   );
-  return result;
+  return result.length > 0 ? result[0].orders : [];
 };
 
 const getTotalPriceFromDB = async (userId: number) => {
