@@ -28,3 +28,16 @@ To start the application in production mode, use the following command:<br>npm s
     <li>Development<br>
 For development with automatic transpile and restart on file changes, use:<br>npm run start:dev</li>
 </ul>
+<h3>Code Linting:</h3>
+<h5>To lint your code using ESLint, run:</h5>
+<p>npm run lint</p>
+<h5>To automatically fix linting issues, run:</h5>
+<p>npm run lint:fix</p>
+<h3>Code Formatting</h3>
+<h5>To format your code using Prettier, run:</h5>
+<p>npm run prettier</p>
+<h5>To automatically fix formatting issues, run:</h5>
+<p>npm run prettier:fix</p>
+<h3>Testing</h3>
+<h5>To run tests, use the following command:</h5>
+<p>npm test</p>
