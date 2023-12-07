@@ -12,9 +12,9 @@ const addressSchema = z.object({
 });
 
 const orderSchema = z.object({
-  productName: z.string().min(1, { message: 'Product name cannot be empty' }),
-  price: z.number().min(0.01, { message: 'Price must be greater than 0' }),
-  quantity: z.number().min(1, { message: 'Quantity must be at least 1' }),
+  productName: z.string().optional(),
+  price: z.number().optional(),
+  quantity: z.number().optional(),
 });
 
 const userZodValidationSchema = z.object({
@@ -31,7 +31,7 @@ const userZodValidationSchema = z.object({
     z.string().min(1, { message: 'Hobby name cannot be empty' }),
   ),
   address: addressSchema,
-  orders: z.array(orderSchema),
+  orders: z.array(orderSchema).optional(),
 });
 
 export default userZodValidationSchema;

@@ -6,7 +6,12 @@ import { pick } from 'lodash';
 const createUser = async (req: Request, res: Response) => {
   try {
     const zodValidationData = userZodValidationSchema.parse(req.body);
-    const result = await UserServices.createUserIntoDB(zodValidationData);
+    const orders = zodValidationData.orders || [];
+
+    const result = await UserServices.createUserIntoDB({
+      ...zodValidationData,
+      orders,
+    });
 
     res.status(200).json({
       success: true,
